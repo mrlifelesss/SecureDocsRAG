@@ -2,7 +2,7 @@
 
 ## 1. Project Overview
 
-This project implements a sophisticated **Retrieval-Augmented Generation (RAG)** chatbot using **LangGraph** and **Google Gemini**. It answers questions within a defined domain (e.g., *Cloud Security / AWS IAM*) by retrieving relevant passages from a local knowledge base and generating responses grounded in those passages.
+This project implements a sophisticated **Retrieval-Augmented Generation (RAG)** chatbot using **LangGraph** and **Google Gemini**. It answers questions within a defined domain of AWS Cload Security by retrieving relevant passages from a local knowledge base and generating responses grounded in those passages.
 
 **Key Features:**
 
