@@ -1,0 +1,28 @@
+python-dotenv
+
+# LangChain stack
+langchain>=0.2
+langchain-community>=0.2
+langchain-google-genai>=1.0
+langgraph>=0.2
+langchain-chroma
+
+# Gemini client (used under the hood by langchain-google-genai)
+google-generativeai>=0.7
+
+# Vector DB
+chromadb>=0.5
+
+# Document loaders & parsing
+pypdf>=4.0
+pymupdf>=1.24
+unstructured>=0.14
+beautifulsoup4
+lxml
+html5lib
+
+# Retrieval extras
+rank-bm25
+
+# UI
+streamlit>=1.32

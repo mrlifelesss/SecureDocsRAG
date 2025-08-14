@@ -1,0 +1,33 @@
+# Python virtual environment
+.venv/
+venv/
+env/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment variables
+# CRITICAL: This file contains your API key!
+.env
+
+# Vector Database Storage
+# This folder can get very large and shouldn't be in version control.
+# It will be recreated by running ingest.py.
+storage/
+
+# IDE-specific files
+.idea/
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+#Large Files
+data/    
+*.mp4
+
+  

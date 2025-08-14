@@ -1,0 +1,177 @@
+[
+  {
+    "id": 1,
+    "question": "List  five core capability domains described in the AWS Cloud Adoption Framework (CAF) Security Perspective.",
+    "expected_keywords": [
+      "identity and access management",
+      "detection",
+      "infrastructure protection",
+      "data protection",
+      "incident response"
+    ],
+    "category": "CAF Security Perspective"
+  },
+  {
+    "id": 2,
+    "question": "What are three key recommendations for protecting AWS root user credentials?",
+    "expected_keywords": [
+      "enable MFA",
+      "do not use for daily tasks",
+      "use strong password",
+      "store securely"
+    ],
+    "category": "IAM Best Practices"
+  },
+  {
+    "id": 3,
+    "question": "Explain the principle of least privilege in the context of AWS IAM and give two practical implementation methods.",
+    "expected_keywords": [
+      "grant minimum permissions",
+      "restrict resources",
+      "use IAM policies",
+      "use conditions"
+    ],
+    "category": "IAM Best Practices"
+  },
+  {
+    "id": 4,
+    "question": "Which AWS service can automatically detect publicly accessible S3 buckets and what actions can be taken upon detection?",
+    "expected_keywords": [
+      "Access Analyzer",
+      "block public access",
+      "update bucket policy",
+      "restrict access"
+    ],
+    "category": "Data Protection"
+  },
+  {
+    "id": 5,
+    "question": "Describe the difference between customer-managed keys and AWS-managed keys in AWS KMS.",
+    "expected_keywords": [
+      "customer managed",
+      "full control",
+      "rotation",
+      "AWS managed",
+      "automatic rotation",
+      "less control"
+    ],
+    "category": "Data Protection"
+  },
+  {
+    "id": 6,
+    "question": "Name four AWS services that provide logging or monitoring capabilities to support security operations.",
+    "expected_keywords": [
+      "CloudTrail",
+      "Config",
+      "GuardDuty",
+      "Security Hub",
+      "CloudWatch"
+    ],
+    "category": "Detection and Monitoring"
+  },
+  {
+    "id": 7,
+    "question": "What is the purpose of AWS Security Hub and how does it integrate with other AWS security services?",
+    "expected_keywords": [
+      "central view",
+      "security findings",
+      "integrates GuardDuty",
+      "Inspector",
+      "Config"
+    ],
+    "category": "Detection and Monitoring"
+  },
+  {
+    "id": 8,
+    "question": "In the AWS Shared Responsibility Model, list three security tasks that are always the responsibility of the customer.",
+    "expected_keywords": [
+      "data classification",
+      "IAM",
+      "application security",
+      "network traffic protection"
+    ],
+    "category": "Security Fundamentals"
+  },
+  {
+    "id": 9,
+    "question": "What is the recommended method to provide temporary access to AWS resources for external collaborators?",
+    "expected_keywords": [
+      "IAM role",
+      "assume role",
+      "temporary credentials",
+      "trust policy"
+    ],
+    "category": "IAM Best Practices"
+  },
+  {
+    "id": 10,
+    "question": "Describe two encryption options for data at rest in Amazon S3 and their main differences.",
+    "expected_keywords": [
+      "SSE-S3",
+      "SSE-KMS",
+      "SSE-S3 uses Amazon managed keys",
+      "SSE-KMS uses KMS keys",
+      "access control differences"
+    ],
+    "category": "Data Protection"
+  },
+  {
+    "id": 11,
+    "question": "What is GuardDuty\u2019s role in threat detection and what types of findings can it produce?",
+    "expected_keywords": [
+      "threat detection",
+      "malicious activity",
+      "unauthorized access",
+      "compromised instance",
+      "reconnaissance"
+    ],
+    "category": "Detection and Monitoring"
+  },
+  {
+    "id": 12,
+    "question": "List three preventative controls recommended by AWS for securing the network layer.",
+    "expected_keywords": [
+      "VPC security groups",
+      "network ACLs",
+      "AWS WAF",
+      "Shield"
+    ],
+    "category": "Infrastructure Protection"
+  },
+  {
+    "id": 13,
+    "question": "What AWS service provides automated compliance checks against security best practices and industry standards?",
+    "expected_keywords": [
+      "AWS Config",
+      "conformance packs",
+      "security best practices",
+      "compliance checks"
+    ],
+    "category": "Compliance and Governance"
+  },
+  {
+    "id": 14,
+    "question": "Describe the incident response steps recommended in the AWS CAF Security Perspective.",
+    "expected_keywords": [
+      "prepare",
+      "detect",
+      "analyze",
+      "contain",
+      "eradicate",
+      "recover",
+      "post-incident analysis"
+    ],
+    "category": "Incident Response"
+  },
+  {
+    "id": 15,
+    "question": "How can AWS Organizations be used to enforce security guardrails across multiple accounts?",
+    "expected_keywords": [
+      "service control policies",
+      "centralized management",
+      "restrict actions",
+      "govern accounts"
+    ],
+    "category": "Governance"
+  }
+]
