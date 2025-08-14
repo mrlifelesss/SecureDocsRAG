@@ -6,8 +6,9 @@ This project implements a sophisticated **Retrieval-Augmented Generation (RAG)**
 
 **Key Features:**
 
-*   **Conversational Query Rewriting:** Understands follow-up questions (e.g., "elaborate on number 2") by rewriting them into standalone queries using chat history.
-*   **Document Ingestion:** Preprocesses and chunks local files (PDF, HTML, MD, TXT).
+*   **Conversational Query Rewriting:** Improves answer quality by  rewriting questions into form more optimal for sementic RAG.
+*   **Follow-Up Question Understanding:** Understands follow-up questions (e.g., "elaborate on number 2") by rewriting them into standalone queries using chat history.
+*   **Document Ingestion:** Preprocesses and chunks local files (PDF) via semantic chunking.
 *   **Hybrid Retrieval:** Uses dense vector search (Chroma) and optional keyword search (BM25) to find candidate documents.
 *   **LLM Reranking:** A Gemini-powered node evaluates and selects the most relevant passages before generation.
 *   **Grounded Generation with In-line Citations:** Gemini generates answers strictly from the provided context and cites sources directly in the text (e.g., `...using MFA [1][3].`).
@@ -48,7 +49,7 @@ Streamlit UI streams the answer and parses citations to show verified sources.
 
 1.  **Data Ingestion (`ingest.py`)**
 
-    *   Loads files from `data/` (PDF/HTML/Markdown/TXT).
+    *   Loads files from `data/` (PDF).
     *   Cleans and normalizes text (removes artifacts, collapses whitespace).
     *   Prepends a header (`<Title — Page N>`) to each page to improve retrieval and citations.
     *   Splits into overlapping chunks (defaults to **600** chars, **120** overlap).
@@ -79,8 +80,8 @@ Streamlit UI streams the answer and parses citations to show verified sources.
 | **Google Gemini**                | LLM for generation & reranking   | Strong reasoning, reliable JSON, and instruction-following |
 | **GoogleGenerativeAIEmbeddings** | Dense embeddings                 | High-quality, same vendor as LLM                         |
 | **Chroma**                       | Vector DB                        | Lightweight, local, persistent                           |
-| **BM25 (optional)**              | Keyword retrieval                | Boosts recall for acronyms/phrases                       |
-| **PyMuPDF / Unstructured / etc.**| Parsing documents                | Robust multi-format extraction                           |
+| **BM25**                         | Keyword retrieval                | Boosts recall for acronyms/phrases                       |
+| **PyMuPDF/Unstructured/PyPDF/BS**| Parsing documents                | Robust multi-format extraction                           |
 | **Streamlit**                    | UI                               | Fast to build and run locally                            |
 | **Settings Management**          | Centralized configuration        | `settings.py` provides typed, env-aware defaults         |
 
@@ -98,7 +99,7 @@ Streamlit UI streams the answer and parses citations to show verified sources.
 1.  **Clone & enter project**
 
     ```bash
-    git clone <your-repo-url>
+    git clone https://github.com/mrlifelesss/elad_rag_project
     cd <your-project-folder>
     ```
 
@@ -165,7 +166,7 @@ All settings are managed in `settings.py` and can be overridden with environment
 
 **Key settings in `settings.py`:**
 
-*   `GEMINI_MODEL`: Defaults to `gemini-1.5-flash`.
+*   `GEMINI_MODEL`: Defaults to `gemini-2.5-flash`.
 *   `EMBED_MODEL`: Defaults to `models/text-embedding-004`.
 *   `CHUNK_SIZE`, `CHUNK_OVERLAP`: Document ingestion parameters.
 *   `RETRIEVE_K`, `FETCH_K`, `MMR_LAMBDA`: Retrieval tuning parameters.
@@ -174,12 +175,10 @@ All settings are managed in `settings.py` and can be overridden with environment
 
 ## 8. Troubleshooting
 
-*   **Empty or irrelevant answers**:
+*   **Irrelevant answers or out-of-scope errors**:
     *   Ensure you placed files into `data/` and ran `python ingest.py`.
     *   Verify `storage/` contains Chroma files.
     *   Confirm `COLLECTION_NAME` in `settings.py` matches what was used during ingestion.
-*   **Citations are missing or incorrect**:
-    *   The LLM may sometimes fail to follow the in-line citation prompt perfectly. This is a known challenge. The prompt in `graph.py` can be tweaked for better compliance.
 *   **Slow answers**:
     *   The `rerank` node adds latency. You can experiment with making the graph simpler (`rewrite → retrieve → generate`) for speed at the cost of some relevance.
 
@@ -187,6 +186,8 @@ All settings are managed in `settings.py` and can be overridden with environment
 
 ## 9. Future Improvements
 
-*   **More Robust Evaluation:** Create a script to run questions from `eval_questions.json` and score the generated answers for factual consistency and citation accuracy.
-*   **LLM-as-Judge Verification:** As an alternative to in-line parsing, one could implement a "judge" LLM that verifies each source against the final answer, which is slower but can be more robust if the primary LLM fails to cite correctly.
+*   **More Robust Evaluation:** Create a script to run questions from `eval_questions.json` and score the generated answers for factual consistency and citation accuracy.   
 *   **Support for remote vector stores** (e.g., Pinecone/Weaviate) for larger-scale applications.
+*   **Document Type Filtering** for better retrival accuracy.
+*   **LLM-as-Judge Verification:** As an alternative to in-line parsing, one could implement a "judge" LLM that verifies each source against the final answer, which is slower but can be more robust if the primary LLM fails to cite correctly.
+*   **Ingestion UI** Allow to adding documents to the knowledge base directly from the UI.
