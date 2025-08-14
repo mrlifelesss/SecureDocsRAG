@@ -8,7 +8,7 @@ This project implements a sophisticated **Retrieval-Augmented Generation (RAG)**
 
 *   **Conversational Query Rewriting:** Improves answer quality by  rewriting questions into form more optimal for sementic RAG.
 *   **Follow-Up Question Understanding:** Understands follow-up questions (e.g., "elaborate on number 2") by rewriting them into standalone queries using chat history.
-*   **Document Ingestion:** Preprocesses and chunks local files (PDF) via semantic chunking.
+*   **Document Ingestion:** Preprocesses and chunks local files (PDF/HTML/MD) via semantic chunking.
 *   **Hybrid Retrieval:** Uses dense vector search (Chroma) and optional keyword search (BM25) to find candidate documents.
 *   **LLM Reranking:** A Gemini-powered node evaluates and selects the most relevant passages before generation.
 *   **Grounded Generation with In-line Citations:** Gemini generates answers strictly from the provided context and cites sources directly in the text (e.g., `...using MFA [1][3].`).
@@ -49,7 +49,7 @@ Streamlit UI streams the answer and parses citations to show verified sources.
 
 1.  **Data Ingestion (`ingest.py`)**
 
-    *   Loads files from `data/` (PDF).
+    *   Loads files from `data/` (PDF/HTML/MD).
     *   Cleans and normalizes text (removes artifacts, collapses whitespace).
     *   Prepends a header (`<Title — Page N>`) to each page to improve retrieval and citations.
     *   Splits into overlapping chunks (defaults to **600** chars, **120** overlap).
