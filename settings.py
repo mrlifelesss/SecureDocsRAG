@@ -182,6 +182,7 @@ class Settings:
     TOPIC_ROUTING_ENABLED: bool     # if you tag docs with "topic" in metadata
     RAG_DEBUG: bool                 # reserved; keep False unless you add logging
 
+    MCP_SERVER_URL: str
     @staticmethod
     def from_env() -> "Settings":
         """Build a `Settings` object from environment variables (with defaults).
@@ -233,7 +234,9 @@ class Settings:
         # Feature flags
         TOPIC_ROUTING_ENABLED = _getenv_bool("TOPIC_ROUTING_ENABLED", True)
         RAG_DEBUG = _getenv_bool("RAG_DEBUG", False)
-
+       
+        MCP_SERVER_URL = _getenv_str("MCP_SERVER_URL", "http://localhost:8999")
+       
         return Settings(
             DOMAIN=DOMAIN,
             DATA_DIR=DATA_DIR,
@@ -255,6 +258,7 @@ class Settings:
             BROADEN_SCHEDULE=BROADEN_SCHEDULE,
             TOPIC_ROUTING_ENABLED=TOPIC_ROUTING_ENABLED,
             RAG_DEBUG=RAG_DEBUG,
+            MCP_SERVER_URL=MCP_SERVER_URL,
         )
 
 

@@ -16,7 +16,7 @@ import re
 from pathlib import Path
 import streamlit as st
 from graph import prepare_context, stream_generate, DOMAIN, MIN_CONTEXT_CHARS
-
+from agent_graph import run_agent, stream_agent
 # --------------------------------------------------------------------------
 # 1. SETUP & CONFIGURATION
 # --------------------------------------------------------------------------
@@ -181,7 +181,7 @@ with st.sidebar:
             st.rerun()
     st.markdown("---")
     st.caption("Built with LangGraph, Gemini, and Streamlit.")
-
+mode = st.sidebar.radio("Mode", ["RAG (classic)", "Agent"], index=0)
 
 # --------------------------------------------------------------------------
 # 5. MAIN CHAT INTERFACE
@@ -210,51 +210,106 @@ if user_q:
         st.markdown(user_q)
 
     with st.chat_message("assistant"):
-        with st.spinner("Searching and thinking..."):
-            ctx_state = prepare_context(user_q, chat_history=st.session_state["chat"], prior_docs=st.session_state.get("prior_docs", []))
-        
-        ctx = ctx_state.get("context", "")
-        sources = ctx_state.get("sources", [])
-        kept_docs = ctx_state.get("kept_docs", [])
-        
-        if len(ctx) < MIN_CONTEXT_CHARS:
-            clarify_msg = ("I don’t have enough information to answer confidently.\n\nCould you clarify one of:\n- AWS service (IAM, S3, etc.)\n- Scope (account/organization)\n- A specific keyword")
-            st.markdown(clarify_msg)
-            st.session_state["chat"].append({"role": "assistant", "content": clarify_msg, "sources": [], "confidence": "Low"})
-        else:
-            # Stream the generated response
-            streamed_response = st.write_stream(stream_generate(user_q, ctx, domain=DOMAIN))
+        if mode == "Agent":
+            # --- AGENT PATH (streams the final turn) ---
+            # Agent internally decides when to call your RAG tool; it returns a complete answer that
+            # already includes "Sources:" lines (from the tool) when available.
+            def gen():
+                yield from stream_agent(user_q)
+            streamed_response = st.write_stream(gen)
 
-            # === NEW PARSING STEP ===
-            # Parse the streamed response to find which sources the LLM cited
-            verified_sources = parse_and_filter_sources(streamed_response, sources)
-            
-            # Extract confidence from the answer itself if present, otherwise default
-            confidence_match = re.search(r"Confidence:\s*(High|Medium|Low)", streamed_response, re.IGNORECASE)
-            confidence = confidence_match.group(1) if confidence_match else "Medium"
-            
-            # Display confidence pill and the PARSED/VERIFIED sources
+            # Confidence: accept either "CONFIDENCE:HIGH" prefix or "Confidence: High" line
+            m = re.search(r"(?:^|\b)CONFIDENCE:\s*(HIGH|MEDIUM|LOW)\b|Confidence:\s*(High|Medium|Low)", streamed_response, re.I)
+            if m:
+                val = next(g for g in m.groups() if g)
+                confidence = val.capitalize()
+            else:
+                confidence = "Medium"
             st.markdown(f"<span class='pill'>Confidence: {confidence}</span>", unsafe_allow_html=True)
-            if verified_sources:
-                with st.expander("Sources", expanded=False):
-                    render_sources(verified_sources)
-            
-            # Store the response and PARSED/VERIFIED sources in chat history
+
+            # Optional: you can parse and show the plain “Sources:” block to the user as-is:
+            # (This keeps things simple; your structured parse relies on a separate sources list)
+            # If you prefer, skip this and let citations remain inside the answer text.
+            # s_block = re.search(r"(?:^|\n)Sources:\s*\n(.+)$", streamed_response, flags=re.I|re.S)
+            # if s_block:
+            #     with st.expander("Sources", expanded=False):
+            #         st.code(s_block.group(1).strip())
+
             st.session_state["chat"].append({
                 "role": "assistant",
                 "content": streamed_response,
-                "sources": verified_sources,
+                "sources": [],            # agent answer already includes Sources: lines
                 "confidence": confidence,
             })
 
-        st.session_state["prior_docs"] = kept_docs
+            # Optional (post-hoc) memory update so follow-ups stay snappy:
+            # We silently compute kept_docs and store them for the next turn without changing the shown answer.
+            try:
+                ctx_state = prepare_context(user_q, chat_history=st.session_state["chat"], prior_docs=st.session_state.get("prior_docs", []))
+                st.session_state["prior_docs"] = ctx_state.get("kept_docs", [])
+            except Exception:
+                pass
+
+        else:
+            # --- CLASSIC RAG PATH (your existing behavior) ---
+            with st.spinner("Searching and thinking..."):
+                ctx_state = prepare_context(
+                    user_q,
+                    chat_history=st.session_state["chat"],
+                    prior_docs=st.session_state.get("prior_docs", [])
+                )
+
+            ctx = ctx_state.get("context", "")
+            sources = ctx_state.get("sources", [])
+            kept_docs = ctx_state.get("kept_docs", [])
+
+            if len(ctx) < MIN_CONTEXT_CHARS:
+                clarify_msg = (
+                    "I don’t have enough information to answer confidently.\n\n"
+                    "Could you clarify one of:\n- AWS service (IAM, S3, etc.)\n- Scope (account/organization)\n- A specific keyword"
+                )
+                st.markdown(clarify_msg)
+                st.session_state["chat"].append({
+                    "role": "assistant",
+                    "content": clarify_msg,
+                    "sources": [],
+                    "confidence": "Low"
+                })
+            else:
+                # Stream the generated response
+                streamed_response = st.write_stream(stream_generate(user_q, ctx, domain=DOMAIN))
+
+                # Parse the streamed response to find which sources the LLM cited
+                verified_sources = parse_and_filter_sources(streamed_response, sources)
+
+                # Extract confidence from the answer if present
+                confidence_match = re.search(r"(?:^|\b)CONFIDENCE:\s*(HIGH|MEDIUM|LOW)\b|Confidence:\s*(High|Medium|Low)", streamed_response, re.IGNORECASE)
+                confidence = (next(g for g in confidence_match.groups() if g).capitalize()
+                              if confidence_match else "Medium")
+
+                st.markdown(f"<span class='pill'>Confidence: {confidence}</span>", unsafe_allow_html=True)
+                if verified_sources:
+                    with st.expander("Sources", expanded=False):
+                        render_sources(verified_sources)
+
+                st.session_state["chat"].append({
+                    "role": "assistant",
+                    "content": streamed_response,
+                    "sources": verified_sources,
+                    "confidence": confidence,
+                })
+
+            # Save memory for next turn
+            st.session_state["prior_docs"] = kept_docs
+
 
 # --- Footer ---
 st.markdown(
-    "<div style='text-align:center; margin-top:24px; color:#9ca3af;'>"
-    "<span class='pill'>Rewrite → Retrieve → Rerank → Generate</span> "
-    "<span class='pill'>Chroma + BM25</span> "
-    "<span class='pill'>Gemini</span>"
-    "</div>",
+    f"<div style='text-align:center; margin-top:24px; color:#9ca3af;'>"
+    f"<span class='pill'>Mode: {mode}</span> "
+    f"<span class='pill'>Rewrite → Retrieve → Rerank → Generate</span> "
+    f"<span class='pill'>Chroma + BM25</span> "
+    f"<span class='pill'>Gemini</span>"
+    f"</div>",
     unsafe_allow_html=True,
 )

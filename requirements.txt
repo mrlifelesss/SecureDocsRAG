@@ -26,3 +26,8 @@ rank-bm25
 
 # UI
 streamlit>=1.32
+
+# MCP client SDK (needed for: from mcp.client.stdio import stdio_client)
+mcp[cli]>=0.1.0
+
+pytest

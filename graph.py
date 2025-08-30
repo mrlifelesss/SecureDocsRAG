@@ -225,6 +225,10 @@ prompt = ChatPromptTemplate.from_messages([
     ("system", SYSTEM),
     ("human", USER),
 ])
+prompt = prompt.partial(
+    n_items="",
+    domain=DOMAIN,
+)
 
 
 # --------------------------------------------------------------------------
