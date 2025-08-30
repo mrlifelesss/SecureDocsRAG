@@ -2,7 +2,7 @@
 
 ## 1. Project Overview
 
-This project implements a sophisticated **Retrieval-Augmented Generation (RAG)** chatbot using **LangGraph** and **Google Gemini**. It answers questions within a defined domain of AWS Cload Security by retrieving relevant passages from a local knowledge base and generating responses grounded in those passages.
+This project implements a sophisticated **Retrieval-Augmented Generation (RAG)** assistant for AWS Cload Security using **LangGraph** and **Google Gemini**. It enables semantic search, context-aware Q&A, and explainability within answers questions within a defined domain of AWS Cload Security by retrieving relevant passages from a local knowledge base and generating responses grounded in those passages.
 
 **Key Features:**
 
@@ -29,7 +29,7 @@ Here is a brief demonstration of the chatbot in action, showing a conversational
 
 The diagram below illustrates the flow of data through the LangGraph application, from the initial user question to the final, grounded answer.
 
-![LangGraph RAG Architecture](graph_visualization.png)
+<img width="121" height="461" alt="Architecture_Diagram" src="https://github.com/user-attachments/assets/88a92cf8-dfe7-4c8d-80ce-ac3a5c8fdb81" />
 
 ### High-Level Flow
 
